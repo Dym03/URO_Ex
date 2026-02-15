@@ -22,6 +22,9 @@
 - ### I will try to upload code from the exercies here on github so you can use what we have created during the exercise
 - ### As far as the points from the exercices, I think you have a lot of other things to do. So if you test the things out in the project, the points from the exercices lose purpose as the assignments are almost allways part of your project. So they will be added accordingly to the max of the projects. This might change if any of you or supervisor raise any objections.
 
+## Support Info
+- ### https://mrl.cs.vsb.cz/people/fabian/uro/uro.pdf
+
 ## AI usage
 ### These project are far from being hard, I believe that all of you should be able to write them yourself, but I will not be punishing anyone using AI, but I would like to note that during the presentation I would like you to understand the code you are presenting, and you are able to make minor changes to the look or functionality. Also note that what you learn now, might be usefull later, and now is the time to test things with trial and error, and later in work this might not be possible.
 
