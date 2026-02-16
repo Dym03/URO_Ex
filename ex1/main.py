@@ -32,6 +32,7 @@ class BikeApp(ctk.CTk):
         self.geometry("1200x800")
         self.font = ("Roboto",30)
         self.bike_path = "bikes.csv"
+        self.create_form()
 
     def create_form(self):
         self.brand_label = ctk.CTkLabel(self, pady = 10, text="Brand Name", width=200, font=self.font)
@@ -46,10 +47,8 @@ class BikeApp(ctk.CTk):
         self.size_label.pack(ipady = 10)
         self.size_input = ctk.CTkOptionMenu(self, values=SIZE, font=self.font, dropdown_font=self.font)
         self.size_input.pack()
-        self.empty_label = ctk.CTkLabel(self, pady = 10, text="")
-        self.empty_label.pack()
         self.add_button = ctk.CTkButton(self, text="Add Bike", font=self.font, command=self.add_bike)
-        self.add_button.pack(ipady = 15)
+        self.add_button.pack(ipady = 15, pady = 20)
     
     def add_bike(self):
         brand = self.brand_input.get()
@@ -63,6 +62,18 @@ class BikeApp(ctk.CTk):
         else:
             print("Fill all the inputs")
 
+def load_bikes_from_csv(path): 
+    bikes = []
+    with open(path, "r") as file:
+        for line in file.readlines():
+            line = line.strip()
+            tokens = line.split(",")
+            id = int(tokens[0])
+            brand = tokens[1].strip()
+            model = tokens[2].strip()
+            size = tokens[3].strip()
+            bikes.append(Bike(id, brand, model, size))
+    return bikes
 
 
 BRAND_MODEL = {"Giant" : ["Trance", "Propel", "Roadster"], 
