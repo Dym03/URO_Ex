@@ -25,6 +25,7 @@
 ## Support Info
 - ### [Lectures from Mr. Fabian](https://mrl.cs.vsb.cz/people/fabian/uro/uro.pdf)
 - ### [CustomTkinter](https://customtkinter.tomschimansky.com/)
+- ### [Tkinter Color Chart](https://cs111.wellesley.edu/archive/cs111_fall14/public_html/labs/lab12/tkintercolor.html)
 
 ## AI usage
 ### These project are far from being hard, I believe that all of you should be able to write them yourself, but no one will be punished for using AI, but I would like to note that during the presentation I would like you to understand the code you are presenting, and you are able to make minor changes to the look or functionality. Also note that what you learn now, might be useful later, and now is the time to test things with trial and error, and later in work this might not be possible.

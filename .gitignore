@@ -1,3 +1,5 @@
 **/.env
 **/*.csv
 **/test.py
+**/*.xls
+**/*.txt
