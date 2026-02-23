@@ -16,6 +16,9 @@ SAMPLE_DATA = [
             ["Specialized", "Rockhopper", "Mountain", "L", "29", "5", "$700.00"],
         ]
 
+ctk.set_window_scaling(1.3)  # Scales the window size
+ctk.set_widget_scaling(1.3)  # Scales the widgets and fonts
+
 class Bike:
     id = 0
     def __init__(self, brand, model, size, _type="", wheel_size="", quantity=0, price=0, description=""):
