@@ -26,8 +26,8 @@ void MainWindow::create_layout() {
     this->create_navbar();
     this->create_action_bar();
     this->create_inventory();
+    this->create_table();
     this->create_form();
-    this->top_level_layout->addStretch();
 
     apply_dark_theme(this);
 }
@@ -42,6 +42,9 @@ void MainWindow::create_navbar() {
     home->setObjectName("navBtn");
     store->setObjectName("navBtn");
     info->setObjectName("navBtn");
+
+    connect(info, SIGNAL(clicked()), this, SLOT(on_info_clicked()));
+
     QLineEdit* search_bar = new QLineEdit();
     search_bar->setPlaceholderText("Search");
     navbar_layout->addWidget(app_name);
@@ -51,6 +54,37 @@ void MainWindow::create_navbar() {
     navbar_layout->addStretch();
     navbar_layout->addWidget(search_bar);
     this->top_level_layout->addLayout(navbar_layout);
+}
+
+void MainWindow::on_info_clicked() {
+    this->info_window = new QDialog(this);
+    info_window->resize(400, 400);
+    QVBoxLayout* info_layout = new QVBoxLayout();
+    info_layout->setAlignment(Qt::AlignTop | Qt::AlignCenter);
+    info_layout->setContentsMargins(10, 10, 10, 10);
+    info_window->setWindowTitle("Info");
+    info_window->setObjectName("info_window");
+
+
+    QLabel* info_header = new QLabel("Info for bike app");
+    info_header->setAlignment(Qt::AlignCenter);
+    info_layout->addWidget(info_header);
+
+    QTextEdit* feedback = new QTextEdit();
+    feedback->setPlaceholderText("Feedback");
+    info_layout->addWidget(feedback);
+
+    QPushButton* exit_btn = new QPushButton("Send");
+    info_layout->addWidget(exit_btn);
+
+    connect(exit_btn, SIGNAL(clicked()), this, SLOT(on_send_clicked()));
+
+    info_window->setLayout(info_layout);
+    info_window->exec();
+}
+
+void MainWindow::on_send_clicked() {
+    info_window->done(0);
 }
 
 void MainWindow::create_action_bar() {
@@ -73,9 +107,56 @@ void MainWindow::create_action_bar() {
 }
 
 void MainWindow::create_inventory() {
-
     this->inventory = parse_bikes_csv("bikes.csv");
+}
 
+void MainWindow::create_table() {
+    QFrame* table_container = new QFrame();
+    table_container->setObjectName("formCard");
+
+    QVBoxLayout* table_layout = new QVBoxLayout(table_container);
+
+    std::vector<QString> headers = {"Brand", "Name", "Type", "Size", "Wheel Size", "Stock", "Price"};
+
+    this->model = new QStandardItemModel(0, headers.size());
+
+    for (size_t i = 0; i < headers.size(); i++) {
+        this->model->setHeaderData(i, Qt::Horizontal, headers[i]);
+    }
+
+    QTableView* table = new QTableView();
+    table->setModel(this->model);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->verticalHeader()->setVisible(false);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    connect(table, SIGNAL(clicked(QModelIndex)), this, SLOT(on_item_selected(QModelIndex)));
+
+    table_layout->addWidget(table);
+
+    for (auto bike: this->inventory) {
+        model->appendRow(bike.to_row());
+    }
+
+    this->top_level_layout->addWidget(table_container, 1);
+}
+
+void MainWindow::on_item_selected(QModelIndex idx) {
+    if (idx.isValid()) {
+        int row = idx.row();
+        for (int col = 0; col < model->columnCount(); ++col) {
+            QStandardItem *item = model->item(row, col);
+            if (item) {
+                QString text = item->text();
+                qDebug() << "Column" << col << ":" << text;
+            }
+        }
+    }
 }
 
 void MainWindow::create_form() {
@@ -135,11 +216,11 @@ void MainWindow::create_form() {
 void apply_dark_theme(QWidget *window) {
     QString qss = R"(
         /* Global Background and Text */
-        QMainWindow, QWidget {
+        QMainWindow, QWidget, QDialog {
             background-color: #1e222d;
             color: #d1d5db;
             font-family: 'Segoe UI', Roboto, sans-serif;
-        }
+        } 
 
         /* Table Styling */
         QTableView {

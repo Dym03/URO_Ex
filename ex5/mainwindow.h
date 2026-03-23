@@ -13,8 +13,8 @@
 #include <QTextEdit>
 #include <QTableView>
 #include <QHeaderView>
-#include <QCoreApplication>
-#include <QDir>
+#include <QDialog>
+#include <QTextBlock>
 #include <iostream>
 
 #include "bike.h"
@@ -44,6 +44,8 @@ class MainWindow : public QMainWindow
 
 public:
     QVBoxLayout * top_level_layout{nullptr};
+    QStandardItemModel* model;
+    QDialog* info_window;
 
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -55,6 +57,11 @@ public:
     void create_inventory();
 
     std::vector<Bike> inventory;
+
+public slots:
+    void on_item_selected(QModelIndex idx);
+    void on_info_clicked();
+    void on_send_clicked();
 
 private:
     Ui::MainWindow *ui;
