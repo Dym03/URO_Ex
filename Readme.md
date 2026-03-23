@@ -11,8 +11,8 @@
     - ### Monday Exercise: 9.3
     - ### Tuesday Exercise: 10.3 Might be delayed due to VSB activities | Online
 - ## Second project presentation (Qt/C++) (15- 30)
-    - ### Monday Exercise: 6.4 Might be delayed due to VSB activities | Online
-    - ### Tuesday Exercise: 7.4 
+    - ### Monday Exercise: 13.4 Might be delayed due to VSB activities | Online
+    - ### Tuesday Exercise: 14.4 
 - ## Third project presentation (Bootstrap) (5 - 20)
     - ### Projects might be done in other frameworks if you are familiar with them, I dont mind, they are just not going to be taught at the exercices
     -  ### Monday Exercise: 11.5
