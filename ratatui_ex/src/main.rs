@@ -487,7 +487,6 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                     }
                                 }
                             }
-                            app.input_mode = Some(input);
                         }
                     }
                     KeyCode::Tab => {
