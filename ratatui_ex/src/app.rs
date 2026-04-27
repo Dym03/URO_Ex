@@ -2,8 +2,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::{fs, io};
 
+use crate::audio::{Player, Playlist, Song};
 use ratatui::widgets::ListState;
-use crate::audio::{Player, Song, Playlist};
 
 const SONGS_DIR: &str = "songs";
 
@@ -84,7 +84,7 @@ impl App {
                     io::ErrorKind::Other,
                     "Failed to load playlist, creating new one",
                 ))
-            },
+            }
         }
     }
 

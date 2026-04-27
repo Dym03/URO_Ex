@@ -1,7 +1,5 @@
 use ratatui_ex::app::{App, CurrentScene, InputMode, SceneEvent};
 // use ratatui_ex::downloader::DownloadEvent;
-use ratatui_ex::audio::{Player, Playlist, Song};
-use ratatui_ex::ui::ui;
 use flexi_logger::{FileSpec, Logger};
 use ratatui::Terminal;
 use ratatui::crossterm::event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode};
@@ -11,6 +9,8 @@ use ratatui::crossterm::terminal::{
 };
 use ratatui::prelude::{Backend, CrosstermBackend};
 use ratatui::widgets::ListState;
+use ratatui_ex::audio::{Player, Playlist, Song};
+use ratatui_ex::ui::ui;
 use std::error::Error;
 use std::io;
 use std::time::Duration;
@@ -90,7 +90,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                 CurrentScene::Main => {
                                     app.curr_scene = CurrentScene::Exiting;
                                 }
-                                | CurrentScene::AddToPlaylist
+                                CurrentScene::AddToPlaylist
                                 | CurrentScene::SelectPlaylist
                                 | CurrentScene::ConfirmRemove { .. }
                                 | CurrentScene::Exiting => {}
@@ -112,7 +112,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                         }
                                     }
                                 }
-                                | CurrentScene::AddToPlaylist
+                                CurrentScene::AddToPlaylist
                                 | CurrentScene::SelectPlaylist
                                 | CurrentScene::ConfirmRemove { .. }
                                 | CurrentScene::Exiting => {}
@@ -129,7 +129,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                         }
                                     }
                                 }
-                                | CurrentScene::AddToPlaylist
+                                CurrentScene::AddToPlaylist
                                 | CurrentScene::SelectPlaylist
                                 | CurrentScene::ConfirmRemove { .. }
                                 | CurrentScene::Exiting => {}
@@ -142,7 +142,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                             .with_selected(Some(0)),
                                     });
                                 }
-                                | CurrentScene::AddToPlaylist
+                                CurrentScene::AddToPlaylist
                                 | CurrentScene::SelectPlaylist
                                 | CurrentScene::ConfirmRemove { .. }
                                 | CurrentScene::Exiting => {}
@@ -169,8 +169,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                         playlist_name: String::default(),
                                     });
                                 }
-                                | CurrentScene::ConfirmRemove { .. }
-                                | CurrentScene::Exiting => {}
+                                CurrentScene::ConfirmRemove { .. } | CurrentScene::Exiting => {}
                             },
                             '-' => {
                                 if let Some(input) = &mut app.input_mode {
@@ -185,7 +184,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                                 };
                                             }
                                         }
-                                        | InputMode::CreatePlaylist { .. }
+                                        InputMode::CreatePlaylist { .. }
                                         | InputMode::AddToPlaylist { .. } => {}
                                     }
                                 } else if let Some(playlist) = app.get_default_playlist()
@@ -211,7 +210,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                         player.switch_shuffle();
                                     }
                                 }
-                                | CurrentScene::AddToPlaylist
+                                CurrentScene::AddToPlaylist
                                 | CurrentScene::SelectPlaylist
                                 | CurrentScene::ConfirmRemove { .. }
                                 | CurrentScene::Exiting => {}
@@ -222,7 +221,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                         player.switch_repeat();
                                     }
                                 }
-                                | CurrentScene::AddToPlaylist
+                                CurrentScene::AddToPlaylist
                                 | CurrentScene::SelectPlaylist
                                 | CurrentScene::ConfirmRemove { .. }
                                 | CurrentScene::Exiting => {}
@@ -256,9 +255,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                 | CurrentScene::SelectPlaylist => {}
                             },
                             'n' => match &app.curr_scene {
-                                CurrentScene::Exiting => {
-                                    app.curr_scene = CurrentScene::Main
-                                }
+                                CurrentScene::Exiting => app.curr_scene = CurrentScene::Main,
                                 CurrentScene::ConfirmRemove { event } => match event {
                                     SceneEvent::RemoveSong { song_index: _ } => {
                                         app.curr_scene = CurrentScene::Main;
@@ -281,7 +278,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                         CurrentScene::AddToPlaylist => {
                             if let Some(input) = &app.input_mode {
                                 match input {
-                                    InputMode::SelectPlaylist { .. } 
+                                    InputMode::SelectPlaylist { .. }
                                     | InputMode::AddToPlaylist { .. } => {
                                         app.curr_scene = CurrentScene::Main;
                                         app.input_mode = None;
@@ -411,9 +408,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                     song_to_be_added,
                                     selected_playlist,
                                 } => {
-                                    
-                                    if let Some(selected_idx) = selected_playlist.selected()
-                                    {
+                                    if let Some(selected_idx) = selected_playlist.selected() {
                                         let correct_index = selected_idx + 1; // Needs to be increased by one because the first playlist is the "all songs"
                                         app.add_song_to_playlist(
                                             correct_index,
@@ -444,7 +439,6 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                     app.input_mode = None;
                                 }
                                 InputMode::CreatePlaylist { playlist_name } => {
-                                    
                                     if playlist_name.is_empty() {
                                         app.error_message =
                                             Some("Playlist Name cannot be empty".to_string());
@@ -460,7 +454,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                                             }
                                         }
                                     }
-                                    
+
                                     match app.curr_scene {
                                         CurrentScene::AddToPlaylist => {
                                             if let Some(song) = app

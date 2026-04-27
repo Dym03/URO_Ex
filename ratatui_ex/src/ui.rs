@@ -165,21 +165,23 @@ fn render_content(frame: &mut Frame, area: Rect, app: &mut App) {
         CurrentScene::ConfirmRemove { event } => {
             let (option, hint) = match event {
                 SceneEvent::RemoveSong { song_index } => {
-                    
-                    if let Some(player) = &app.player && let Some(song) = player.get_songs().get(*song_index){
-                        (format!("Do you really want to remove {} song ?", song.name),
-                        "Y to remove | N to go back")
+                    if let Some(player) = &app.player
+                        && let Some(song) = player.get_songs().get(*song_index)
+                    {
+                        (
+                            format!("Do you really want to remove {} song ?", song.name),
+                            "Y to remove | N to go back",
+                        )
                     } else {
                         ("".to_string(), "")
                     }
-                    
                 }
                 SceneEvent::RemovePlaylist { playlist_index } => {
                     if let Some(playlist) = app.get_playlists().get(*playlist_index) {
                         let playlist_name = playlist.borrow().name.clone();
                         (
-                        format!("Do you really want to remove {playlist_name} playlist ?"),
-                        "Y to remove | N to go back",
+                            format!("Do you really want to remove {playlist_name} playlist ?"),
+                            "Y to remove | N to go back",
                         )
                     } else {
                         ("".to_string(), "")
@@ -254,10 +256,8 @@ fn render_select_playlist(frame: &mut Frame, app: &mut App) {
                 song_to_be_added: _,
             } => {}
             InputMode::SelectPlaylist { selected_playlist } => {
-                
                 let playlists = app.get_playlists();
                 render_playlist_list(frame, chunks[1], playlists, selected_playlist);
-                
 
                 let return_text_block = Block::default()
                     .title_alignment(Alignment::Center)
@@ -324,7 +324,6 @@ fn render_add_to_playlist_ui(frame: &mut Frame, app: &mut App) {
         frame.render_widget(title, chunks[0]);
 
         match &mut editing {
-
             InputMode::AddToPlaylist {
                 selected_playlist,
                 song_to_be_added: _,
@@ -336,7 +335,6 @@ fn render_add_to_playlist_ui(frame: &mut Frame, app: &mut App) {
                     &[]
                 };
                 render_playlist_list(frame, chunks[1], playlists_to_render, selected_playlist);
-            
 
                 let return_text_block = Block::default()
                     .title_alignment(Alignment::Center)
@@ -378,7 +376,7 @@ fn render_add_to_playlist_ui(frame: &mut Frame, app: &mut App) {
                 frame.render_widget(return_text, chunks[2]);
             }
         };
-        app.input_mode = Some(editing); 
+        app.input_mode = Some(editing);
     }
 }
 

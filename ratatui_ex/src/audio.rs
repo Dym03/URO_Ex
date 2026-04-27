@@ -293,7 +293,9 @@ impl Player {
     }
 
     pub fn add_to_queue(&mut self) -> Result<(), PlayerError> {
-        if self.song_queue.empty() && let Some(song) = self.get_selected_song() {
+        if self.song_queue.empty()
+            && let Some(song) = self.get_selected_song()
+        {
             self.playing_song = Some(song.clone());
             self.play_song(song)?;
         } else if let Some(song) = self.get_selected_song() {
