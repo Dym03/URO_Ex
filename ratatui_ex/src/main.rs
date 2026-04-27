@@ -48,7 +48,6 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
         //         }
         //     }
         // }
-        // --snip--
         if event::poll(Duration::from_millis(100))? {
             // handle user input
             if let Event::Key(key) = event::read()? {
@@ -503,6 +502,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                 Ok(_) => {}
                 Err(_) => app.error_message = Some("Failed to play song".to_string()),
             }
+        } else {
+            app.animation_tick = app.animation_tick.wrapping_add(1);
         }
     }
 }

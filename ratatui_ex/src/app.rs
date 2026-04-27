@@ -52,6 +52,7 @@ pub struct App {
     // pub downloader: Option<Downloader>,
     pub error_message: Option<String>,
     pub show_info: bool,
+    pub animation_tick: usize,
 }
 
 impl App {
@@ -64,6 +65,7 @@ impl App {
             // downloader: None,
             show_info: false,
             playlists: Vec::new(),
+            animation_tick: 0,
         }
     }
 

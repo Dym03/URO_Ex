@@ -1,7 +1,8 @@
-use std::{cell::RefCell, collections::VecDeque, rc::Rc, time::Duration};
+use std::{cell::RefCell, rc::Rc, time::Duration};
 
 use ratatui::{
     Frame,
+    prelude::Stylize,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Style},
     text::{Line, Span, Text},
@@ -36,10 +37,11 @@ fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
 }
 
 pub fn ui(frame: &mut Frame, app: &mut App) {
+    // TODO!
+    // Define the main layout 
+
     let mut constraints = vec![
-        Constraint::Max(3),  // title
         Constraint::Fill(1), // main content
-        Constraint::Max(3),  // footer
     ];
 
     if app.error_message.is_some() {
@@ -51,14 +53,11 @@ pub fn ui(frame: &mut Frame, app: &mut App) {
         .constraints(constraints)
         .split(frame.area());
 
-    render_title(frame, chunks[0]);
-    render_content(frame, chunks[1], app);
+    render_content(frame, chunks[0], app);
 
     if app.error_message.is_some() {
         render_error(frame, chunks[2], app);
     }
-
-    render_footer(frame, *chunks.last().unwrap(), app);
 
     if let CurrentScene::Exiting = app.curr_scene {
         render_confirm_popup(
@@ -87,74 +86,122 @@ fn render_error(frame: &mut Frame, chunks: Rect, app: &mut App) {
 }
 
 fn render_title(frame: &mut Frame, area: Rect) {
-    let block = Block::default().borders(Borders::ALL);
-    let title = Paragraph::new("Rust song Player")
-        .style(Style::default().fg(Color::Green))
-        .block(block)
-        .alignment(Alignment::Center);
+    // TODO!
+    // Block with borders
+    // Paragraph with title aligned to the center and some styling
+    
+    // frame.render_widget(title, area);
+}
 
-    frame.render_widget(title, area);
+fn render_uro_marquee(frame: &mut Frame, area: Rect, app: &App) {
+
+    if app.animation_tick < 90 {
+        let intro_area = centered_rect(68, 42, area);
+
+        let intro_panel = Block::default()
+            .borders(Borders::ALL)
+            .title(Line::from(vec![
+                Span::styled(
+                    " CLASS MODE ",
+                    Style::default().fg(Color::Black).bg(Color::LightCyan),
+                ),
+                Span::raw(" "),
+                Span::styled("opening riff", Style::default().fg(Color::Yellow)),
+            ]))
+            .title_alignment(Alignment::Center)
+            .style(Style::default().bg(Color::Rgb(12, 14, 24)).fg(Color::White));
+
+        let pulse = match app.animation_tick % 4 {
+            0 => "reading the room",
+            1 => "warming up the speakers.",
+            2 => "warming up the speakers..",
+            _ => "warming up the speakers...",
+        };
+
+        let progress = (app.animation_tick as f64 / 90.0).min(1.0);
+        let gauge = Gauge::default()
+            .block(Block::default().borders(Borders::ALL).title("Attention"))
+            .gauge_style(Style::default().fg(Color::White).bg(Color::Black))
+            .label(Span::styled(
+                format!("first minute energy {pulse}"),
+                Style::default().fg(Color::Red).bold(),
+            ))
+            .ratio(progress);
+
+        let intro_chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Length(3),
+                Constraint::Fill(1),
+                Constraint::Length(3),
+            ])
+            .split(intro_area);
+
+        let headline = Paragraph::new(Line::from(vec![
+            Span::styled(
+                "Welcome in.",
+                Style::default().fg(Color::LightGreen).bold(),
+            ),
+            Span::raw(" "),
+            Span::styled(
+                "This view starts with a quick visual cue so the room locks in fast.",
+                Style::default().fg(Color::Gray),
+            ),
+        ]))
+        .block(intro_panel)
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true });
+
+        let body = Paragraph::new(Text::from(vec![
+            Line::from(vec![
+                Span::styled("Press ", Style::default().fg(Color::Gray)),
+                Span::styled("q", Style::default().fg(Color::LightRed).bold()),
+                Span::styled(" to exit, ", Style::default().fg(Color::Gray)),
+                Span::styled("space", Style::default().fg(Color::LightBlue).bold()),
+                Span::styled(" to play, and let the banner fade into the set.", Style::default().fg(Color::Gray)),
+            ]),
+            Line::from(""),
+            Line::from(vec![
+                Span::styled("Tip:", Style::default().fg(Color::Yellow).bold()),
+                Span::raw(" the marquee motion keeps moving underneath the card."),
+            ]),
+        ]))
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true })
+        .block(Block::default().borders(Borders::ALL).title("Today"));
+
+        frame.render_widget(Clear, intro_area);
+        frame.render_widget(headline, intro_chunks[0]);
+        frame.render_widget(body, intro_chunks[1]);
+        frame.render_widget(gauge, intro_chunks[2]);
+    }
+}
+
+fn render_main_scene(frame: &mut Frame, area: Rect, app: &mut App) {
+    render_uro_marquee(frame, area, app);
+    // TODO!
+    // Check for player
+    // Define Constraints
+    // Check for playing song and if there is one add a gauge for the song progress
+    // HINT: 
+    //     let playlist = &mut *playlist_guard;
+    //     let songs = &playlist.songs;
+    //     let state = &mut playlist.state;
+    // Divide into Info | Songs | Queue (if there are songs in the queue) - VecDeque for the constraints
+    // Queue songs should be only 30 chars, maybe with a marquee effect if the name is too long
+
+    // Methods:
+    // render_song_progress
+    // render_song_queue
+    // render_song_list
+    // render_info
+
 }
 
 fn render_content(frame: &mut Frame, area: Rect, app: &mut App) {
     match &app.curr_scene {
         CurrentScene::Main => {
-            let mut constraints = vec![];
-            constraints.push(Constraint::Fill(1));
-
-            if let Some(player) = app.player.as_mut() {
-                let song_progress = player.has_playing_song();
-                if song_progress {
-                    constraints.push(Constraint::Max(3));
-                }
-
-                let chunks = Layout::default()
-                    .direction(Direction::Vertical)
-                    .constraints(constraints)
-                    .split(area);
-
-                let song_elapsed_time = player.get_song_elapsed_duration();
-                let mut playlist_guard = player.playlist.borrow_mut();
-
-                let playlist = &mut *playlist_guard;
-                let songs = &playlist.songs;
-                let state = &mut playlist.state;
-
-                let mut constraints_for_songs = VecDeque::new();
-                constraints_for_songs.push_back(Constraint::Fill(3));
-                if player.has_songs_in_queue() {
-                    constraints_for_songs.push_back(Constraint::Fill(1));
-                }
-
-                if app.show_info {
-                    constraints_for_songs.push_front(Constraint::Fill(1));
-                }
-
-                let chunks_for_songs = Layout::default()
-                    .direction(Direction::Horizontal)
-                    .constraints(constraints_for_songs)
-                    .split(chunks[0]);
-
-                if app.show_info {
-                    render_info(frame, chunks_for_songs[0]);
-                    render_song_list(frame, chunks_for_songs[1], songs, state);
-                } else {
-                    render_song_list(frame, chunks_for_songs[0], songs, state);
-                }
-
-                if player.has_songs_in_queue() {
-                    let songs_in_queue: Vec<String> = player
-                        .get_song_queue()
-                        .iter()
-                        .map(|song| song.name.chars().take(40).collect())
-                        .collect();
-                    render_song_queue(frame, *chunks_for_songs.last().unwrap(), songs_in_queue);
-                }
-
-                if song_progress && let Some(playing_song) = player.get_current_playing_song() {
-                    render_song_progress(frame, chunks[1], playing_song, song_elapsed_time);
-                }
-            }
+            render_main_scene(frame, area, app);
         }
         CurrentScene::AddToPlaylist => {
             render_add_to_playlist_ui(frame, app);
@@ -196,37 +243,18 @@ fn render_content(frame: &mut Frame, area: Rect, app: &mut App) {
 }
 
 fn render_info(frame: &mut Frame, area: Rect) {
-    let mut list_items = Vec::<ListItem>::new();
+    // TODO!
+    // Vector of lines Span::raw and Span::styled
+    // Block with borders and title aligned to the center
 
     let commands = [
-        "add to playlist | +",
-        "remove from playlist | -",
-        "change playlist | p",
-        "add to queue | a",
-        "download | d",
-        "quit | q",
+        ("add to playlist", "+"),
+        ("remove from playlist", "-"),
+        ("change playlist", "p"),
+        ("add to queue", "a"),
+        ("download", "d"),
+        ("quit", "q"),
     ];
-
-    for command in commands.iter() {
-        list_items.push(ListItem::new(
-            Line::from(Span::styled(
-                command.to_string(),
-                Style::default().fg(Color::Yellow),
-            ))
-            .alignment(Alignment::Center),
-        ));
-    }
-
-    let list = List::new(list_items)
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title("Commands")
-                .title_alignment(Alignment::Center),
-        )
-        .highlight_style(Style::default().fg(Color::Black));
-
-    frame.render_widget(list, area);
 }
 
 fn render_select_playlist(frame: &mut Frame, app: &mut App) {
@@ -381,26 +409,12 @@ fn render_add_to_playlist_ui(frame: &mut Frame, app: &mut App) {
 }
 
 fn render_song_queue(frame: &mut Frame<'_>, area: Rect, songs_in_queue: Vec<String>) {
-    let mut list_items = Vec::<ListItem>::new();
+    // TODO!
+    // Add each song in the queue
 
-    for song in songs_in_queue.iter() {
-        list_items.push(ListItem::new(
-            Line::from(Span::styled(
-                format!("{: <25}", song),
-                Style::default().fg(Color::Yellow),
-            ))
-            .alignment(Alignment::Center),
-        ));
-    }
-
-    let list = List::new(list_items).block(
-        Block::default()
-            .borders(Borders::ALL)
-            .title("Queue")
-            .title_alignment(Alignment::Center),
-    );
-
-    frame.render_widget(list, area);
+    // HINT: Span::styled(
+    //             format!("{: <25}", song),
+    //             Style::default().fg(Color::Yellow)
 }
 
 fn render_song_progress(
@@ -498,36 +512,15 @@ fn render_playlist_list(
 }
 
 fn render_footer(frame: &mut Frame, area: Rect, app: &App) {
-    let navigation_options = match app.curr_scene {
+    let navigation_options: Vec<&str> = match app.curr_scene {
         CurrentScene::Main => {
-            if let Some(player) = &app.player {
-                let shuffle = if player.get_shuffle() {
-                    "shuffle off | s"
-                } else {
-                    "shuffle on | s"
-                };
-                let repeat = if player.get_repeat() {
-                    "repeat off | r"
-                } else {
-                    "repeat on | r"
-                };
-
-                let play = if player.is_playing() && !player.has_different_selected() {
-                    "pause | space"
-                } else {
-                    "play | space"
-                };
-
-                let info = if app.show_info {
-                    "close commands | i"
-                } else {
-                    "show commands | i"
-                };
-
-                vec![shuffle, "prev | <-", play, "next | ->", repeat, info]
-            } else {
-                vec!["prev | <-", "play | space ", "next | ->", "quit | q"]
-            }
+            // TODO!
+            // Check if Player
+            // Shuffle
+            // Repeat
+            // Play/Pause
+            // Show/hide commands
+            vec![]
         }
         CurrentScene::Exiting
         | CurrentScene::AddToPlaylist
@@ -535,23 +528,9 @@ fn render_footer(frame: &mut Frame, area: Rect, app: &App) {
         | CurrentScene::ConfirmRemove { .. } => vec![],
     };
 
-    let constraints: Vec<Constraint> = navigation_options
-        .iter()
-        .map(|_| Constraint::Fill(1))
-        .collect();
-
-    let chunks = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints(constraints)
-        .split(area);
-
-    for (i, nav_opt) in navigation_options.iter().enumerate() {
-        let widget = Paragraph::new(*nav_opt)
-            .block(Block::default().borders(Borders::ALL))
-            .alignment(Alignment::Center);
-
-        frame.render_widget(widget, chunks[i]);
-    }
+    // TODO!
+    // Fill for each option in the navigation options vector
+    // Widget(Par) for each option with borders and render each one 
 }
 
 fn render_confirm_popup(frame: &mut Frame, block_text: &str, options_text: &str) {
